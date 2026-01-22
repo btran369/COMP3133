@@ -1,0 +1,3 @@
+Hello, World!
+This is a test of the write stream.
+This is the end of the write stream.

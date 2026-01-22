@@ -1,0 +1,15 @@
+{
+  "name": "w2_lab",
+  "version": "1.0.0",
+  "description": "week 2 lab",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.2.0"
+  }
+}
