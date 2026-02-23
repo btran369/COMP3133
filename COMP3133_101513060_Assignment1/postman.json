@@ -1,0 +1,326 @@
+{
+  "info": {
+    "_postman_id": "7f0b0c0d-9b1c-4b2b-9e45-4a6b8c7a1111",
+    "name": "COMP3133 Assignment 1 - GraphQL (graphql-http)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Employee Management System backend tests for COMP3133 Assignment 1 (Signup, Login, Employee CRUD, Search, Cloudinary upload)."
+  },
+  "item": [
+    {
+      "name": "01 Auth",
+      "item": [
+        {
+          "name": "Signup (Mutation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: SignupInput!) { Signup(input: $input) { success message token user { _id username email created_at updated_at } } }\",\n  \"variables\": {\n    \"input\": {\n      \"username\": \"demo_user_1\",\n      \"email\": \"demo_user_1@example.com\",\n      \"password\": \"Password123!\"\n    }\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Signup success true', function () { pm.expect(json.data.Signup.success).to.eql('true'); });",
+                  "if (json?.data?.Signup?.token) {",
+                  "  pm.collectionVariables.set('token', json.data.Signup.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (Query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ($input: LoginInput!) { Login(input: $input) { success message token user { _id username email } } }\",\n  \"variables\": {\n    \"input\": {\n      \"usernameOrEmail\": \"demo_user_1\",\n      \"password\": \"Password123!\"\n    }\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Login success true', function () { pm.expect(json.data.Login.success).to.eql('true'); });",
+                  "pm.test('Token returned', function () { pm.expect(json.data.Login.token).to.be.a('string'); });",
+                  "pm.collectionVariables.set('token', json.data.Login.token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Employees",
+      "item": [
+        {
+          "name": "GetAllEmployees (Query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { GetAllEmployees { _id first_name last_name email gender designation salary date_of_joining department employee_photo created_at updated_at } }\"\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Returns an array', function () { pm.expect(json.data.GetAllEmployees).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AddEmployee (Mutation) - with photo (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "operations",
+                  "type": "text",
+                  "value": "{\n  \"query\": \"mutation ($input: EmployeeInput!, $photo: Upload) { AddEmployee(input: $input, photo: $photo) { success message employee { _id first_name last_name email employee_photo } } }\",\n  \"variables\": {\n    \"input\": {\n      \"first_name\": \"Jane\",\n      \"last_name\": \"Doe\",\n      \"email\": \"jane.doe@example.com\",\n      \"gender\": \"Female\",\n      \"designation\": \"Developer\",\n      \"salary\": 5000,\n      \"date_of_joining\": \"2026-02-01\",\n      \"department\": \"IT\"\n    },\n    \"photo\": null\n  }\n}\n"
+                },
+                {
+                  "key": "map",
+                  "type": "text",
+                  "value": "{ \"0\": [\"variables.photo\"] }"
+                },
+                {
+                  "key": "0",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('AddEmployee success true', function () { pm.expect(json.data.AddEmployee.success).to.eql('true'); });",
+                  "pm.test('Employee id returned', function () { pm.expect(json.data.AddEmployee.employee._id).to.be.a('string'); });",
+                  "pm.collectionVariables.set('eid', json.data.AddEmployee.employee._id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SearchEmployeeByEid (Query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ($eid: ID!) { SearchEmployeeByEid(eid: $eid) { _id first_name last_name email gender designation salary date_of_joining department employee_photo } }\",\n  \"variables\": {\n    \"eid\": \"{{eid}}\"\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Returned employee matches eid', function () { pm.expect(json.data.SearchEmployeeByEid._id).to.eql(pm.collectionVariables.get('eid')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "UpdateEmployeeByEid (Mutation) - optional new photo (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "operations",
+                  "type": "text",
+                  "value": "{\n  \"query\": \"mutation ($eid: ID!, $input: UpdateEmployeeInput!, $photo: Upload) { UpdateEmployeeByEid(eid: $eid, input: $input, photo: $photo) { success message employee { _id first_name last_name email designation salary department employee_photo updated_at } } }\",\n  \"variables\": {\n    \"eid\": \"{{eid}}\",\n    \"input\": {\n      \"designation\": \"Senior Developer\",\n      \"salary\": 6500\n    },\n    \"photo\": null\n  }\n}\n"
+                },
+                {
+                  "key": "map",
+                  "type": "text",
+                  "value": "{ \"0\": [\"variables.photo\"] }"
+                },
+                {
+                  "key": "0",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('UpdateEmployee success true', function () { pm.expect(json.data.UpdateEmployeeByEid.success).to.eql('true'); });",
+                  "pm.test('Designation updated', function () { pm.expect(json.data.UpdateEmployeeByEid.employee.designation).to.eql('Senior Developer'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SearchEmployeeByDesignationOrDepartment (Query)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ($designation: String, $department: String) { SearchEmployeeByDesignationOrDepartment(designation: $designation, department: $department) { _id first_name last_name email designation department } }\",\n  \"variables\": {\n    \"designation\": \"Senior Developer\",\n    \"department\": null\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Returns an array', function () { pm.expect(json.data.SearchEmployeeByDesignationOrDepartment).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DeleteEmployeeByEid (Mutation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($eid: ID!) { DeleteEmployeeByEid(eid: $eid) { success message } }\",\n  \"variables\": {\n    \"eid\": \"{{eid}}\"\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('No GraphQL errors', function () { pm.expect(json.errors).to.be.undefined; });",
+                  "pm.test('Delete success true', function () { pm.expect(json.data.DeleteEmployeeByEid.success).to.eql('true'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "eid", "value": "" }
+  ]
+}
