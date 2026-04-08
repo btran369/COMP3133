@@ -1,59 +1,156 @@
-# 101513060LabTest2Comp3133
+# 🚀 SpaceX Mission Angular App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.23.
+## 📌 App Description
 
-## Development server
+This project is an Angular application that fetches and displays SpaceX mission data using a public REST API.
+It allows users to browse SpaceX launches, filter missions by launch year, and view detailed information about each mission.
 
-To start a local development server, run:
+The application is built using the latest Angular standalone architecture and follows best practices such as component-based design, services for API calls, and reactive forms.
+
+---
+
+## ✨ Features Implemented
+
+* 📡 **API Integration**
+
+  * Fetches SpaceX mission data using HttpClient
+
+* 📋 **Mission List Component**
+
+  * Displays all SpaceX launches
+  * Shows:
+
+    * Flight number
+    * Mission name
+    * Launch year
+    * Rocket name and type
+    * Mission details
+    * Mission patch image
+
+* 🔍 **Filter/Search Feature**
+
+  * Filter missions by launch year
+  * Quick-select buttons for common years
+  * Reactive form implementation
+
+* 📄 **Mission Details Component**
+
+  * Displays detailed information of a selected mission
+  * Includes:
+
+    * Full mission details
+    * Rocket info
+    * External links (Article, Wikipedia, Video)
+
+* ⚡ **Modern Angular Features**
+
+  * Standalone components
+  * Angular Signals for state management
+  * Angular control flow
+
+* 🎨 **UI Styling**
+
+  * Angular Material components
+  * Responsive layout
+  * Clean and user-friendly design
+
+---
+
+## 🖼️ Screenshots
+
+### 📋 Mission List View
+
+![Mission List](./screenshots/mission-list.png)
+
+**Description:**
+Displays all SpaceX missions with key details such as mission name, launch year, rocket information, and status.
+
+---
+
+### 🔍 Mission Filter
+
+![Mission Filter](./screenshots/mission-filter.png)
+
+**Description:**
+Allows users to filter missions by launch year using input or quick-select buttons.
+
+---
+
+### 📄 Mission Details View
+
+![Mission Details](./screenshots/mission-details.png)
+
+**Description:**
+Shows detailed information for a selected mission, including rocket details and external resource links.
+
+---
+
+## 🛠️ Instructions to Run the Project
+
+### ▶️ Run Locally
+
+1. Clone the repository:
 
 ```bash
-ng serve
+git clone https://github.com/btran369/101513060-lab-test2-comp3133.git
+cd 101513060-lab-tets2-comp3133
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+2. Install dependencies:
 
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+3. Run the Angular app:
 
 ```bash
-ng generate --help
+ng serve -o
 ```
 
-## Building
+4. Open browser:
 
-To build the project run:
-
-```bash
-ng build
+```
+http://localhost:4200
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+### 🌐 Run Deployed Version
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Access the hosted application here:
+👉 **[Live App Link](https://your-deployed-link.com)**
 
-```bash
-ng test
+---
+
+## 📦 Technologies Used
+
+* Angular (Latest Version)
+* Angular Material
+* TypeScript
+* RxJS
+* SpaceX REST API
+
+---
+
+## 📁 Project Structure
+
+```
+src/app/
+  missionlist/
+  missionfilter/
+  missiondetails/
+  services/
+  models/
+  app.routes.ts
+  app.config.ts
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 👨‍💻 Author
 
-```bash
-ng e2e
-```
+* Student ID: **YOUR_STUDENT_ID**
+* Course: COMP 3133
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
