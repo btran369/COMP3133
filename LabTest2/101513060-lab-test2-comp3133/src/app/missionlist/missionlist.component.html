@@ -1,1 +1,74 @@
-<p>missionlist works!</p>
+<div class="page-wrapper">
+  <h1>SpaceX Mission Launch List</h1>
+
+  <app-missionfilter (yearSelected)="onYearSelected($event)"></app-missionfilter>
+
+  @if (loading()) {
+    <mat-card class="status-card">
+      <p>Loading missions...</p>
+    </mat-card>
+  } @else if (errorMessage()) {
+    <mat-card class="status-card error-card">
+      <p>{{ errorMessage() }}</p>
+    </mat-card>
+  } @else {
+    <div class="content-layout">
+      <div class="mission-list">
+        @for (mission of missions(); track mission.flight_number) {
+          <mat-card class="mission-card" (click)="viewDetails(mission)">
+            <div class="mission-row">
+              <img
+                class="mission-patch"
+                [src]="mission.links.mission_patch_small || 'https://via.placeholder.com/80?text=No+Image'"
+                [alt]="mission.mission_name"
+              />
+
+              <div class="mission-info">
+                <h2>{{ mission.mission_name }}</h2>
+                <p><strong>Flight #:</strong> {{ mission.flight_number }}</p>
+                <p><strong>Launch Year:</strong> {{ mission.launch_year }}</p>
+                <p><strong>Rocket:</strong> {{ mission.rocket.rocket_name }}</p>
+                <p><strong>Type:</strong> {{ mission.rocket.rocket_type }}</p>
+                <p>{{ mission.details || 'No details available.' }}</p>
+
+                @switch (mission.launch_success) {
+                  @case (true) {
+                    <p class="success">Status: Successful Launch</p>
+                  }
+                  @case (false) {
+                    <p class="failed">Status: Failed Launch</p>
+                  }
+                  @default {
+                    <p class="unknown">Status: Unknown</p>
+                  }
+                }
+
+                <div class="links">
+                  @if (mission.links.article_link) {
+                    <a [href]="mission.links.article_link" target="_blank" (click)="$event.stopPropagation()">Article</a>
+                  }
+                  @if (mission.links.wikipedia) {
+                    <a [href]="mission.links.wikipedia" target="_blank" (click)="$event.stopPropagation()">Wikipedia</a>
+                  }
+                  @if (mission.links.video_link) {
+                    <a [href]="mission.links.video_link" target="_blank" (click)="$event.stopPropagation()">Video</a>
+                  }
+                </div>
+              </div>
+            </div>
+          </mat-card>
+        }
+      </div>
+
+      <div class="mission-details-panel">
+        @if (selectedMission()) {
+          <app-missiondetails [mission]="selectedMission()"></app-missiondetails>
+        } @else {
+          <mat-card class="placeholder-card">
+            <p>Select a mission to view details.</p>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+</div>

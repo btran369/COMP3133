@@ -1,1 +1,26 @@
-<p>missionfilter works!</p>
+<div class="filter-panel" [formGroup]="filterForm">
+  <h3>Filter by Launch Year</h3>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Launch Year</mat-label>
+    <input matInput formControlName="launchYear" placeholder="e.g. 2018" />
+  </mat-form-field>
+
+  <div class="filter-buttons">
+    <button mat-raised-button color="primary" type="button" (click)="applyFilter()">
+      Search
+    </button>
+
+    <button mat-stroked-button color="warn" type="button" (click)="clearFilter()">
+      Clear
+    </button>
+  </div>
+
+  <div class="year-chips">
+    @for (year of years(); track year) {
+      <button mat-button type="button" (click)="chooseYear(year)">
+        {{ year }}
+      </button>
+    }
+  </div>
+</div>

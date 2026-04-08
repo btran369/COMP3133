@@ -1,0 +1,36 @@
+.details-card {
+  background: #fff8f0;
+  padding: 10px;
+  position: sticky;
+  top: 20px;
+}
+
+.details-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.details-image {
+  width: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.details-text h3 {
+  margin-bottom: 10px;
+}
+
+.detail-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.detail-links a {
+  text-decoration: none;
+  color: #ad1457;
+  font-weight: 600;
+}
