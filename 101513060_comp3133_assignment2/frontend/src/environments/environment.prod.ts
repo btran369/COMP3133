@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  graphqlUrl: '/graphql',
-  uploadUrl: '/upload'
+  graphqlUrl: '/_/backend/graphql',
+  uploadUrl: '/_/backend/upload'
 };

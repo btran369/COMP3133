@@ -20,6 +20,27 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
 
+// ─── Lazy DB connection (works for both local & serverless) ──
+let dbConnected = false;
+async function ensureDb() {
+  if (!dbConnected) {
+    await connectDb(process.env.MONGO_URI);
+    await seedDatabase();
+    dbConnected = true;
+  }
+}
+
+// Middleware: connect to DB before handling any request
+app.use(async (req, res, next) => {
+  try {
+    await ensureDb();
+    next();
+  } catch (err) {
+    console.error("DB connection error:", err);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
 // ─── GraphQL endpoint ────────────────────────────────
 app.all(
   "/graphql",
@@ -36,7 +57,7 @@ app.all(
 // ─── REST photo upload endpoint ──────────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
       cb(null, true);
@@ -48,23 +69,19 @@ const upload = multer({
 
 app.post("/upload", upload.single("photo"), async (req, res) => {
   try {
-    // Verify auth
     const authHeader = req.headers.authorization || "";
     const authUser = getUserFromAuthHeader(authHeader);
     if (!authUser) {
       return res.status(401).json({ error: "Login required" });
     }
-
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-
     const result = await uploadImageBuffer({
       buffer: req.file.buffer,
       filename: req.file.originalname,
       mimetype: req.file.mimetype
     });
-
     res.json({ url: result.secure_url || result.url || "" });
   } catch (err) {
     console.error("Upload error:", err);
@@ -72,16 +89,14 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
   }
 });
 
-// ─── Serve Angular frontend (production) ─────────────
+// ─── Serve Angular frontend (production / local) ─────
 const frontendDist = path.resolve(__dirname, "../../frontend/dist/101513060-comp3133-assignment2/browser");
 app.use(express.static(frontendDist));
 
-// Fallback: serve index.html for all non-API routes (Angular routing)
 app.get("*", (req, res) => {
   const indexPath = path.join(frontendDist, "index.html");
   res.sendFile(indexPath, (err) => {
     if (err) {
-      // If frontend isn't built yet, send a helpful message
       res.status(200).send(
         "Employee Management GraphQL API is running. " +
         "Build the frontend with 'npm run build:frontend' to serve the Angular app."
@@ -90,13 +105,16 @@ app.get("*", (req, res) => {
   });
 });
 
-// ─── Start ───────────────────────────────────────────
+// ─── Local dev: start listening ──────────────────────
 const port = Number(process.env.PORT || 4000);
 
-await connectDb(process.env.MONGO_URI);
-await seedDatabase();
+if (!process.env.VERCEL) {
+  await ensureDb();
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+    console.log(`GraphQL endpoint: http://localhost:${port}/graphql`);
+  });
+}
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-  console.log(`GraphQL endpoint: http://localhost:${port}/graphql`);
-});
+// ─── Export for Vercel serverless ─────────────────────
+export default app;
