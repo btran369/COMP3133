@@ -89,20 +89,28 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
   }
 });
 
-// ─── Serve Angular frontend (production / local) ─────
-const frontendDist = path.resolve(__dirname, "../../frontend/dist/101513060-comp3133-assignment2/browser");
-app.use(express.static(frontendDist));
+// ─── Serve Angular frontend (local only) ─────────────
+// On Vercel, the frontend is a separate service — no static serving needed
+if (!process.env.VERCEL) {
+  const frontendDist = path.resolve(__dirname, "../../frontend/dist/101513060-comp3133-assignment2/browser");
+  app.use(express.static(frontendDist));
 
-app.get("*", (req, res) => {
-  const indexPath = path.join(frontendDist, "index.html");
-  res.sendFile(indexPath, (err) => {
-    if (err) {
-      res.status(200).send(
-        "Employee Management GraphQL API is running. " +
-        "Build the frontend with 'npm run build:frontend' to serve the Angular app."
-      );
-    }
+  app.get("*", (req, res) => {
+    const indexPath = path.join(frontendDist, "index.html");
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        res.status(200).send(
+          "Employee Management GraphQL API is running. " +
+          "Build the frontend with 'npm run build:frontend' to serve the Angular app."
+        );
+      }
+    });
   });
+}
+
+// ─── Health check (works on Vercel too) ──────────────
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Employee Management GraphQL API is running" });
 });
 
 // ─── Local dev: start listening ──────────────────────
