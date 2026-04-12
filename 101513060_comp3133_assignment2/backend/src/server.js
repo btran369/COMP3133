@@ -92,7 +92,7 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
 // ─── Serve Angular frontend (local only) ─────────────
 // On Vercel, the frontend is a separate service — no static serving needed
 if (!process.env.VERCEL) {
-  const frontendDist = path.resolve(__dirname, "../../frontend/dist/101513060-comp3133-assignment2/browser");
+  const frontendDist = path.resolve(__dirname, "../../frontend/dist/browser");
   app.use(express.static(frontendDist));
 
   app.get("*", (req, res) => {
