@@ -1,14 +1,11 @@
 {
-  "experimentalServices": {
-    "frontend": {
-      "entrypoint": "frontend",
-      "routePrefix": "/",
-      "framework": "angular"
-    },
-    "backend": {
-      "entrypoint": "backend/src/server.js",
-      "routePrefix": "/_/backend",
-      "framework": "express"
-    }
-  }
+  "buildCommand": "cd frontend && npm install && npx ng build --configuration production",
+  "outputDirectory": "frontend/dist/browser",
+  "installCommand": "npm install --prefix backend && npm install --prefix frontend",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/graphql", "destination": "/api/server" },
+    { "source": "/api/upload", "destination": "/api/server" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

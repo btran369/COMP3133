@@ -42,17 +42,17 @@ app.use(async (req, res, next) => {
 });
 
 // ─── GraphQL endpoint ────────────────────────────────
-app.all(
-  "/graphql",
-  createHandler({
-    schema,
-    context: (req) => {
-      const authHeader = req.headers.authorization || "";
-      const authUser = getUserFromAuthHeader(authHeader);
-      return { authUser, req };
-    }
-  })
-);
+const graphqlHandler = createHandler({
+  schema,
+  context: (req) => {
+    const authHeader = req.headers.authorization || "";
+    const authUser = getUserFromAuthHeader(authHeader);
+    return { authUser, req };
+  }
+});
+
+app.all("/graphql", graphqlHandler);
+app.all("/api/graphql", graphqlHandler);
 
 // ─── REST photo upload endpoint ──────────────────────
 const upload = multer({
@@ -67,7 +67,7 @@ const upload = multer({
   }
 });
 
-app.post("/upload", upload.single("photo"), async (req, res) => {
+const uploadHandler = async (req, res) => {
   try {
     const authHeader = req.headers.authorization || "";
     const authUser = getUserFromAuthHeader(authHeader);
@@ -87,7 +87,10 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
     console.error("Upload error:", err);
     res.status(500).json({ error: err.message || "Upload failed" });
   }
-});
+};
+
+app.post("/upload", upload.single("photo"), uploadHandler);
+app.post("/api/upload", upload.single("photo"), uploadHandler);
 
 // ─── Serve Angular frontend (local only) ─────────────
 // On Vercel, the frontend is a separate service — no static serving needed
