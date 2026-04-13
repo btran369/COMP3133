@@ -2,6 +2,7 @@
   "name": "101513060_comp3133_assignment2",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "cd backend && npm start",
     "dev": "cd backend && npm run dev",
